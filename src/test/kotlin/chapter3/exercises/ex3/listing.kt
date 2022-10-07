@@ -8,16 +8,12 @@ import io.kotlintest.shouldThrow
 import io.kotlintest.specs.WordSpec
 
 // tag::init[]
-fun <A> drop(l: List<A>, n: Int): List<A> {
-    tailrec fun loop(xs: List<A>, count: Int): List<A> =
-        if (count == 0) xs else
-        when (xs) {
-            is Nil -> throw IllegalStateException()
-            is Cons -> loop(xs.tail, count - 1)
-        }
-
-    return loop(l, n)
-}
+tailrec fun <A> drop(l: List<A>, n: Int): List<A> =
+    if (n == 0) l else
+    when (l) {
+        is Cons -> drop(l.tail, n - 1)
+        is Nil -> throw IllegalStateException()
+    }
 // end::init[]
 
 //TODO: Enable tests by removing `!` prefix
