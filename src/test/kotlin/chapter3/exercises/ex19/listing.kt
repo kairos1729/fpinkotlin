@@ -2,6 +2,7 @@ package chapter3.exercises.ex19
 
 import chapter3.Cons
 import chapter3.List
+import chapter3.append
 import chapter3.exercises.ex14.concat
 import chapter3.foldRight
 import io.kotlintest.shouldBe
@@ -11,6 +12,10 @@ import io.kotlintest.specs.WordSpec
 fun <A, B> flatMap(xa: List<A>, f: (A) -> List<B>): List<B> =
     concat(foldRight(xa, List.empty(), {x, t -> Cons(f(x), t) }))
 
+// Better solution from answers:
+fun <A, B> flatMap2(xa: List<A>, f: (A) -> List<B>): List<B> =
+    foldRight(xa, List.empty(), {x, t -> append(f(x), t) })
+
 // end::init[]
 
 //TODO: Enable tests by removing `!` prefix
@@ -19,6 +24,8 @@ class Exercise19 : WordSpec({
         "map and flatten a list" {
             val xs = List.of(1, 2, 3)
             flatMap(xs) { i -> List.of(i, i) } shouldBe
+                List.of(1, 1, 2, 2, 3, 3)
+            flatMap2(xs) { i -> List.of(i, i) } shouldBe
                 List.of(1, 1, 2, 2, 3, 3)
         }
     }
