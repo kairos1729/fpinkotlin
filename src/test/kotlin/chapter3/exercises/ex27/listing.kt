@@ -5,17 +5,19 @@ import chapter3.Leaf
 import chapter3.Tree
 import io.kotlintest.shouldBe
 import io.kotlintest.specs.WordSpec
-import utils.SOLUTION_HERE
 
 // tag::init[]
 fun <A, B> map(tree: Tree<A>, f: (A) -> B): Tree<B> =
+    when (tree) {
+        is Leaf -> Leaf(f(tree.value))
+        is Branch -> Branch(map(tree.left, f), map(tree.right, f))
+    }
 
-    SOLUTION_HERE()
 // end::init[]
 
 //TODO: Enable tests by removing `!` prefix
 class Exercise27 : WordSpec({
-    "!tree map" should {
+    "tree map" should {
         "transform all leaves of a map" {
             val actual = Branch(
                 Branch(Leaf(1), Leaf(2)),
