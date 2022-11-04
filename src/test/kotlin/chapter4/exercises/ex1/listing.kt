@@ -51,10 +51,16 @@ fun <A> Option<A>.filter_2(f: (A) -> Boolean): Option<A> =
 //end::alternate[]
 
 // What's so wrong about built-in optionals?
-fun <A, B> A?.map_3(f: (A) -> B): B? = this?.let { f(it) }
-fun <A, B> A?.flatMap_3(f: (A) -> B?) = map_3(f)
-fun <A> A?.getOrElse_3(default: () -> A): A = this ?: default()
-fun <A> A?.orElse_3(ob: () -> A?): A? = getOrElse_3(ob)
+
+// Probably better expressing map and flat map using `?` and `let` as that's
+// more idiomatic - do gere for example
+fun <A, B> A?.map_null(f: (A) -> B): B? = this?.let { f(it) }
+fun <A, B> A?.flatMap_null(f: (A) -> B?) = map_null(f)
+
+// The advantage defining `getOrElse` and `orElse` is that the argument
+// can be lazy
+fun <A> A?.getOrElse_null(default: () -> A): A = this ?: default()
+fun <A> A?.orElse_null(ob: () -> A?): A? = getOrElse_null(ob)
 fun <A> A?.filter_3(f: (A) -> Boolean): A? =
     this?.let { if (f(it)) it else null }
 
@@ -71,11 +77,11 @@ class Exercise1 : WordSpec({
     "option map" should {
         "transform an option of some value" {
             some.map { it * 2 } shouldBe Some(20)
-            someBuiltin.map_3 { it * 2 } shouldBe 20
+            someBuiltin.map_null { it * 2 } shouldBe 20
         }
         "pass over an option of none" {
             none.map { it * 10 } shouldBe None
-            noneBuiltin.map_3 { it * 10 } shouldBe null
+            noneBuiltin.map_null { it * 10 } shouldBe null
         }
     }
 
@@ -90,7 +96,7 @@ class Exercise1 : WordSpec({
                 Some(a.toString())
             } shouldBe Some("10")
 
-            someBuiltin.flatMap_3 { a ->
+            someBuiltin.flatMap_null { a ->
                 a.toString()
             } shouldBe "10"
         }
@@ -103,7 +109,7 @@ class Exercise1 : WordSpec({
                 Some(a.toString())
             } shouldBe None
 
-            noneBuiltin.flatMap_3 { a ->
+            noneBuiltin.flatMap_null { a ->
                 a.toString()
             } shouldBe null
         }
@@ -114,13 +120,13 @@ class Exercise1 : WordSpec({
             some.getOrElse { 0 } shouldBe 10
         }
         "extract the value of some nullable" {
-            someBuiltin.getOrElse_3 { 0 } shouldBe 10
+            someBuiltin.getOrElse_null { 0 } shouldBe 10
         }
         "return a default value if the option is none" {
             none.getOrElse { 10 } shouldBe 10
         }
         "return a default value if the nullable is null" {
-            noneBuiltin.getOrElse_3 { 10 } shouldBe 10
+            noneBuiltin.getOrElse_null { 10 } shouldBe 10
         }
     }
 
@@ -128,12 +134,12 @@ class Exercise1 : WordSpec({
         "return the option if the option is some" {
             some.orElse { Some(20) } shouldBe some
             some.orElse_2 { Some(20) } shouldBe some
-            someBuiltin.orElse_3 { Some(20) } shouldBe someBuiltin
+            someBuiltin.orElse_null { Some(20) } shouldBe someBuiltin
         }
         "return a default option if the option is none" {
             none.orElse { Some(20) } shouldBe Some(20)
             none.orElse_2 { Some(20) } shouldBe Some(20)
-            noneBuiltin.orElse_3 { 20 } shouldBe 20
+            noneBuiltin.orElse_null { 20 } shouldBe 20
         }
     }
 
