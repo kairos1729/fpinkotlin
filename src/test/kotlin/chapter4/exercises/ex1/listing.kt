@@ -52,13 +52,10 @@ fun <A> Option<A>.filter_2(f: (A) -> Boolean): Option<A> =
 
 // What's so wrong about built-in optionals?
 
-// Probably better expressing map and flat map using `?` and `let` as that's
-// more idiomatic - do gere for example
+// Probably better expressing these using `?`, `let` and `?:` as that's
+// more idiomatic. `?:` short-circuits, so you can do lazy evaluation
 fun <A, B> A?.map_null(f: (A) -> B): B? = this?.let { f(it) }
 fun <A, B> A?.flatMap_null(f: (A) -> B?) = map_null(f)
-
-// The advantage defining `getOrElse` and `orElse` is that the argument
-// can be lazy
 fun <A> A?.getOrElse_null(default: () -> A): A = this ?: default()
 fun <A> A?.orElse_null(ob: () -> A?): A? = getOrElse_null(ob)
 fun <A> A?.filter_3(f: (A) -> Boolean): A? =

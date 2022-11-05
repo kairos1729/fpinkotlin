@@ -6,6 +6,7 @@ import chapter3.Nil
 import chapter4.None
 import chapter4.Option
 import chapter4.Some
+import chapter4.exercises.ex3.map2_null
 import chapter4.foldRight
 import chapter4.map2
 import io.kotlintest.shouldBe
@@ -24,7 +25,12 @@ fun <A> sequence1(xs: List<Option<A>>): Option<List<A>> {
 fun <A> sequence(xs: List<Option<A>>): Option<List<A>> =
     xs.foldRight<Option<A>, Option<List<A>>>(
         Some(Nil)
-    ) { oa, ob -> map2(oa, ob) {a, b -> Cons(a, b)}}
+    ) { oa, ob -> map2(oa, ob) { a, b -> Cons(a, b) } }
+
+fun <A> sequence_null(xs: List<A?>): List<A>? =
+    xs.foldRight<A?, List<A>?>(
+        Nil
+    ) { an, bn -> map2_null(an, bn) { a, b -> Cons(a, b) } }
 
 //end::init[]
 
@@ -41,6 +47,18 @@ class Exercise4 : WordSpec({
             val lo =
                 List.of(Some(10), None, Some(30))
             sequence(lo) shouldBe None
+        }
+    }
+
+    "sequence_null" should {
+        "turn a list of some options into an option of list" {
+            val lo =
+                List.of(10, 20, 30)
+            sequence_null(lo) shouldBe List.of(10, 20, 30)
+        }
+        "turn a list of options containing none into a none" {
+            val lo = List.of(10, null, 30)
+            sequence_null(lo) shouldBe null
         }
     }
 })
