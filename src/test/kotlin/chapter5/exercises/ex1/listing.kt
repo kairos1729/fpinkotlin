@@ -18,17 +18,20 @@ class Exercise1 : WordSpec({
             is Cons -> ConsL(head(), tail().toListNonTail())
         }
 
-    tailrec fun <A, B> Stream<A>.foldLeft(z: B, f: (B, A) -> B): B =
+    tailrec fun <A, B> Stream<A>.foldLeft(
+        z: () -> B,
+        f: (() -> B, () -> A) -> () -> B
+    ): B =
         when (this) {
-            is Empty -> z
+            is Empty -> z()
             is Cons -> tail().foldLeft(
-                f(z, head()),
-                f
+                f(z, head), f
             )
         }
 
     fun <A> Stream<A>.toList(): List<A> =
-        this.foldLeft<A, List<A>>(Nil) { bs, h -> ConsL(h, bs) }.reverse()
+        this.foldLeft<A, List<A>>({ Nil }) { bs, h -> { ConsL(h(), bs()) } }
+            .reverse()
 
     //end::init[]
 
