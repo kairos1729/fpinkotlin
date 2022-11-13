@@ -5,6 +5,7 @@ import chapter3.Nil
 import chapter5.Cons
 import chapter5.Empty
 import chapter5.Stream
+import chapter5.Stream.Companion.cons
 import chapter5.toList
 import io.kotlintest.shouldBe
 import io.kotlintest.specs.WordSpec
@@ -19,7 +20,7 @@ class Exercise2 : WordSpec({
         0 -> Empty
         else -> when (this) {
             is Empty -> this
-            is Cons -> Cons(head) { tail().take(n - 1) }
+            is Cons -> cons(head) { tail().take(n - 1) }
         }
     }
     //end::take[]
