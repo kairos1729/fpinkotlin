@@ -30,7 +30,7 @@ class Exercise1 : WordSpec({
         }
 
     fun <A> Stream<A>.toList(): List<A> =
-        this.foldLeft<A, List<A>>({ Nil }) { bs, h -> { ConsL(h(), bs()) } }
+        this.foldLeft<A, List<A>>({ Nil }) { bs, h -> { ConsL(h() , bs()) } }
             .reverse()
 
     //end::init[]
