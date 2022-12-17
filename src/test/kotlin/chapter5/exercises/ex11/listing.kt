@@ -5,22 +5,20 @@ import chapter4.Option
 import chapter4.Some
 import chapter4.getOrElse
 import chapter5.Stream
+import chapter5.Stream.Companion.cons
+import chapter5.Stream.Companion.empty
 import chapter5.solutions.ex13.take
 import chapter5.toList
 import io.kotlintest.shouldBe
 import io.kotlintest.specs.WordSpec
 
 //tag::init[]
-fun <A, S> unfold(z: S, f: (S) -> Option<Pair<A, S>>): Stream<A> {
-    fun go(current: S): Stream<A> =
-        f(current).map { (value, next) ->
-            Stream.cons({ value }, { go(next) })
-        }.getOrElse {
-            Stream.empty()
-        }
-
-    return go(z)
-}
+fun <A, S> unfold(z: S, f: (S) -> Option<Pair<A, S>>): Stream<A> =
+    f(z).map { (value, next) ->
+        cons({ value }, { unfold(next, f) })
+    }.getOrElse {
+        empty()
+    }
 
 //end::init[]
 
