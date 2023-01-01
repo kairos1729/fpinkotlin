@@ -33,6 +33,17 @@ class Exercise4 : WordSpec({
         return go(count, List.empty<Int>() to rng)
     }
 
+    fun intsSolution(count: Int, rng: RNG): Pair<List<Int>, RNG> =
+        when {
+            count > 0 -> {
+                val (i, rng2) = rng.nextInt()
+                val (l, rng3) = intsSolution(count - 1, rng2)
+                Cons(i, l) to rng3
+            }
+            else -> Nil to rng
+
+        }
+
     fun intsUnfold(count: Int, rng: RNG): Pair<List<Int>, RNG> {
         val x = unfold(
             count to rng
@@ -100,6 +111,24 @@ class Exercise4 : WordSpec({
                 -1151252339,
                 384748
             ) to SimpleRNG(223576932655868))
+        }
+    }
+
+    "intsSolution" should {
+        "generate a list of ints of a specified length" {
+
+            intsSolution(5, rng1) shouldBe (List.of(1, 1, 1, 1, 1) to rng1)
+        }
+
+        "generate a list of random ints of a specified length" {
+
+            intsSolution(5, SimpleRNG(1L)) shouldBe (List.of(
+                -883454042,
+                1612966641,
+                -549383847,
+                -1151252339,
+                384748
+            ).reverse() to SimpleRNG(223576932655868))
         }
     }
 })
