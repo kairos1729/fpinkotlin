@@ -1,27 +1,36 @@
 package chapter6.exercises.ex3
 
-import chapter6.RNG
 // import chapter6.solutions.ex2.double
 // import chapter6.solutions.ex5.doubleR
+import chapter6.RNG
+import chapter6.solutions.ex1.nonNegativeInt
+import chapter6.solutions.ex2.double
 import io.kotlintest.shouldBe
 import io.kotlintest.specs.WordSpec
-import utils.SOLUTION_HERE
 
 //TODO: Enable tests by removing `!` prefix
 class Exercise3 : WordSpec({
 
     //tag::init[]
-    fun intDouble(rng: RNG): Pair<Pair<Int, Double>, RNG> =
+    fun intDouble(rng: RNG): Pair<Pair<Int, Double>, RNG> {
+        val (n1, r1) = nonNegativeInt(rng)
+        val (n2, r2) = double(r1)
+        return (n1 to n2) to r2
+    }
 
-        SOLUTION_HERE()
 
-    fun doubleInt(rng: RNG): Pair<Pair<Double, Int>, RNG> =
+    fun doubleInt(rng: RNG): Pair<Pair<Double, Int>, RNG> {
+        val (n1, r1) = double(rng)
+        val (n2, r2) = nonNegativeInt(r1)
+        return (n1 to n2) to r2
+    }
 
-        SOLUTION_HERE()
-
-    fun double3(rng: RNG): Pair<Triple<Double, Double, Double>, RNG> =
-
-        SOLUTION_HERE()
+    fun double3(rng: RNG): Pair<Triple<Double, Double, Double>, RNG> {
+        val (n1, r1) = double(rng)
+        val (n2, r2) = double(r1)
+        val (n3, r3) = double(r2)
+        return (Triple(n1, n2, n3)) to r3
+    }
     //end::init[]
 
     "intDouble" should {
@@ -48,21 +57,21 @@ class Exercise3 : WordSpec({
                 Int.MAX_VALUE to rng2
         }
 
-        "!generate a pair of int and double" {
+        "generate a pair of int and double" {
             val (id, _) = intDouble(rng)
             val (i, d) = id
             i shouldBe Int.MAX_VALUE
             d shouldBe doubleBelowOne
         }
 
-        "!generate a pair of double and int" {
+        "generate a pair of double and int" {
             val (di, _) = doubleInt(rng)
             val (d, i) = di
             d shouldBe doubleBelowOne
             i shouldBe Int.MAX_VALUE
         }
 
-        "!generate a triple of double, double, double" {
+        "generate a triple of double, double, double" {
             val (ddd, _) = double3(rng)
             val (d1, d2, d3) = ddd
             d1 shouldBe doubleBelowOne
