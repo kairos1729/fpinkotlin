@@ -3,7 +3,6 @@ package chapter6.exercises.ex3
 // import chapter6.solutions.ex2.double
 // import chapter6.solutions.ex5.doubleR
 import chapter6.RNG
-import chapter6.solutions.ex1.nonNegativeInt
 import chapter6.solutions.ex2.double
 import io.kotlintest.shouldBe
 import io.kotlintest.specs.WordSpec
@@ -13,16 +12,16 @@ class Exercise3 : WordSpec({
 
     //tag::init[]
     fun intDouble(rng: RNG): Pair<Pair<Int, Double>, RNG> {
-        val (n1, r1) = nonNegativeInt(rng)
-        val (n2, r2) = double(r1)
-        return (n1 to n2) to r2
+        val (i, r1) = rng.nextInt()
+        val (d, r2) = double(r1)
+        return (i to d) to r2
     }
 
 
     fun doubleInt(rng: RNG): Pair<Pair<Double, Int>, RNG> {
-        val (n1, r1) = double(rng)
-        val (n2, r2) = nonNegativeInt(r1)
-        return (n1 to n2) to r2
+        val (id, r1) = intDouble(rng)
+        val (i, d) = id
+        return (d to i) to r1
     }
 
     fun double3(rng: RNG): Pair<Triple<Double, Double, Double>, RNG> {
