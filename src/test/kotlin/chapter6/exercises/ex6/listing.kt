@@ -6,7 +6,6 @@ import chapter6.rng1
 import chapter6.unit
 import io.kotlintest.shouldBe
 import io.kotlintest.specs.WordSpec
-import utils.SOLUTION_HERE
 
 //TODO: Enable tests by removing `!` prefix
 class Exercise6 : WordSpec({
@@ -17,12 +16,15 @@ class Exercise6 : WordSpec({
         rb: Rand<B>,
         f: (A, B) -> C
     ): Rand<C> =
-
-        SOLUTION_HERE()
+        { rng ->
+            val (a, rng1) = ra(rng)
+            val (b, rng2) = rb(rng1)
+            f(a, b) to rng2
+        }
     //end::init[]
 
     "map2" should {
-        "!combine the results of two actions" {
+        "combine the results of two actions" {
 
             val combined: Rand<String> =
                 map2(
