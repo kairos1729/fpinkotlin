@@ -2,25 +2,32 @@ package chapter6.exercises.ex8
 
 import chapter6.Rand
 import chapter6.rng1
-// import chapter6.solutions.ex1.nonNegativeInt
+import chapter6.solutions.ex1.nonNegativeInt
 import chapter6.unit
 import io.kotlintest.shouldBe
 import io.kotlintest.specs.WordSpec
-import utils.SOLUTION_HERE
 
 //TODO: Enable tests by removing `!` prefix
 class Exercise8 : WordSpec({
 
     //tag::init[]
     fun <A, B> flatMap(f: Rand<A>, g: (A) -> Rand<B>): Rand<B> =
+        { rng ->
+            val (i, rng2) = f(rng)
+            g(i)(rng2)
+        }
 
-        SOLUTION_HERE()
     //end::init[]
 
-    fun nonNegativeIntLessThan(n: Int): Rand<Int> = SOLUTION_HERE()
+    fun nonNegativeIntLessThan(n: Int): Rand<Int> =
+        flatMap(::nonNegativeInt) { i ->
+            val mod = i % n
+            if (i + (n - 1) - mod >= 0) unit(mod)
+            else nonNegativeIntLessThan(n)
+        }
 
     "flatMap" should {
-        "!pass along an RNG" {
+        "pass along an RNG" {
 
             val result =
                 flatMap(
@@ -33,7 +40,7 @@ class Exercise8 : WordSpec({
     }
 
     "nonNegativeIntLessThan" should {
-        "!return a non negative int less than n" {
+        "return a non negative int less than n" {
 
             val result =
                 nonNegativeIntLessThan(10)(rng1)
