@@ -2,7 +2,6 @@ package chapter6.exercises.ex10
 
 import chapter3.Cons
 import chapter3.List
-import chapter3.Nil
 import chapter3.foldRight
 import chapter6.RNG
 import chapter6.rng1
@@ -28,10 +27,9 @@ data class State<S, out A>(val run: (S) -> Pair<A, S>) {
             }
 
         fun <S, A> sequence(fs: List<State<S, A>>): State<S, List<A>> =
-            foldRight(fs, unit<S, List<A>>(Nil)) { sa, saa ->
-                map2<S, A, List<A>, List<A>>(sa, saa) { a, aa ->
-                    Cons(a, aa)
-                }
+            foldRight(fs, unit(List.empty()))
+            { sa, saa ->
+                map2(sa, saa) { a, aa -> Cons(a, aa) }
             }
     }
 
