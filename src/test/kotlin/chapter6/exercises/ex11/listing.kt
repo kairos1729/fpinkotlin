@@ -1,17 +1,17 @@
 package chapter6.exercises.ex11
 
 // import arrow.core.Id
-import arrow.core.Tuple2
 // import arrow.core.extensions.id.monad.monad
-import arrow.mtl.State
 // import arrow.mtl.StateApi
 // import arrow.mtl.extensions.fx
+import arrow.core.Tuple2
+import arrow.mtl.State
+import arrow.mtl.run
 import arrow.mtl.runS
-// import arrow.mtl.stateSequential
+import arrow.mtl.stateTraverse
 import io.kotlintest.shouldBe
 import io.kotlintest.specs.WordSpec
 import kotlinx.collections.immutable.persistentListOf
-import utils.SOLUTION_HERE
 
 //tag::init1[]
 sealed class Input
@@ -29,16 +29,37 @@ data class Machine(
 //TODO: Enable tests by removing `!` prefix
 class Exercise11 : WordSpec({
 
-    //tag::init2[]
-    fun simulateMachine(
-        inputs: List<Input>
-    ): State<Machine, Tuple2<Int, Int>> =
+    fun performInput(m: Machine, i: Input): Machine =
+        when (i) {
+            is Coin -> if (m.locked && m.candies > 0) m.copy(
+                locked = false,
+                coins = m.coins + 1
+            ) else m
 
-        SOLUTION_HERE()
-    //end::init2[]
+            is Turn -> if (!m.locked) m.copy(
+                locked = true,
+                candies = m.candies - 1
+            ) else m
+        }
+
+    fun traverseInputs(inputs: List<Input>): State<Machine, List<Tuple2<Int, Int>>> =
+        inputs.stateTraverse { input: Input ->
+            State { m: Machine ->
+                val nm = performInput(m, input)
+                Tuple2(nm, Tuple2(nm.coins, nm.candies))
+
+            }
+        }
+
+    fun simulateMachine(inputs: List<Input>): State<Machine, Tuple2<Int, Int>> =
+        State { m ->
+            val (m2, ts) = traverseInputs(inputs).run(m)
+            Tuple2(m2, ts.last())
+        }
+
 
     "simulateMachine" should {
-        "!allow the purchase of a single candy" {
+        "allow the purchase of a single candy" {
             val actions = persistentListOf(Coin)
             val before =
                 Machine(locked = true, candies = 1, coins = 0)
@@ -46,14 +67,14 @@ class Exercise11 : WordSpec({
                 Machine(locked = false, candies = 1, coins = 1)
             simulateMachine(actions).runS(before) shouldBe after
         }
-        "!allow the redemption of a single candy" {
+        "allow the redemption of a single candy" {
             val actions = persistentListOf(Turn)
             val before =
                 Machine(locked = false, candies = 1, coins = 1)
             val after = Machine(locked = true, candies = 0, coins = 1)
             simulateMachine(actions).runS(before) shouldBe after
         }
-        "!allow purchase and redemption of a candy" {
+        "allow purchase and redemption of a candy" {
             val actions = persistentListOf(Coin, Turn)
             val before =
                 Machine(locked = true, candies = 1, coins = 0)
@@ -63,7 +84,7 @@ class Exercise11 : WordSpec({
     }
 
     "inserting a coin into a locked machine" should {
-        "!unlock the machine if there is some candy" {
+        "unlock the machine if there is some candy" {
             val actions = persistentListOf(Coin)
             val before =
                 Machine(locked = true, candies = 1, coins = 0)
@@ -73,7 +94,7 @@ class Exercise11 : WordSpec({
         }
     }
     "inserting a coin into an unlocked machine" should {
-        "!do nothing" {
+        "do nothing" {
             val actions = persistentListOf(Coin)
             val before =
                 Machine(locked = false, candies = 1, coins = 1)
@@ -83,7 +104,7 @@ class Exercise11 : WordSpec({
         }
     }
     "turning the knob on an unlocked machine" should {
-        "!cause it to dispense candy and lock" {
+        "cause it to dispense candy and lock" {
             val actions = persistentListOf(Turn)
             val before =
                 Machine(locked = false, candies = 1, coins = 1)
@@ -92,7 +113,7 @@ class Exercise11 : WordSpec({
         }
     }
     "turning the knob on a locked machine" should {
-        "!do nothing" {
+        "do nothing" {
             val actions = persistentListOf(Turn)
             val before =
                 Machine(locked = true, candies = 1, coins = 1)
@@ -101,14 +122,14 @@ class Exercise11 : WordSpec({
         }
     }
     "a machine that is out of candy" should {
-        "!ignore the turn of a knob" {
+        "ignore the turn of a knob" {
             val actions = persistentListOf(Turn)
             val before =
                 Machine(locked = true, candies = 0, coins = 0)
             val after = Machine(locked = true, candies = 0, coins = 0)
             simulateMachine(actions).runS(before) shouldBe after
         }
-        "!ignore the insertion of a coin" {
+        "ignore the insertion of a coin" {
             val actions = persistentListOf(Coin)
             val before =
                 Machine(locked = true, candies = 0, coins = 0)
