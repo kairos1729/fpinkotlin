@@ -29,6 +29,7 @@ data class Machine(
 //TODO: Enable tests by removing `!` prefix
 class Exercise11 : WordSpec({
 
+    // My go - not using comprehensions so it doesn't look very imperative
     fun performInput(m: Machine, i: Input): Machine =
         when (i) {
             is Coin -> if (m.locked && m.candies > 0) m.copy(
@@ -56,6 +57,10 @@ class Exercise11 : WordSpec({
             val (m2, ts) = traverseInputs(inputs).run(m)
             Tuple2(m2, ts.last())
         }
+
+    // Solution uses a for comprehension (maybe read arrow docco first...)
+    // Actually since arrow 1.0 there is no State monad, so the solution is
+    // effectively out of date, don't bother to follow it.
 
 
     "simulateMachine" should {
